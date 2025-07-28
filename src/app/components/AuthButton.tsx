@@ -2,40 +2,29 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useMutation, gql } from "@apollo/client";
+
+const SIGN_IN_WITH_GOOGLE = gql`
+  mutation SignInWithGoogle($googleToken: String!) {
+    signInWithGoogle(googleToken: $googleToken) {
+      id
+      name
+      email
+    }
+  }
+`;
 
 const useSignInMutation = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [signInWithGoogle, { loading }] = useMutation(SIGN_IN_WITH_GOOGLE);
   const mutate = async (googleToken: string) => {
-    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
-            mutation SignInWithGoogle($googleToken: String!) {
-              signInWithGoogle(googleToken: $googleToken) {
-                id
-                name
-                email
-              }
-            }
-          `,
-          variables: { googleToken },
-        })
-      });
-
-      const result = await response.json();
-      console.log("BFF Response:", result);
+      await signInWithGoogle({ variables: { googleToken } });
     } catch (error) {
       console.error("Error signing in with BFF:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
-
-  return { mutate, isLoading };
-}
+  return { mutate, isLoading: loading };
+};
 
 export default function AuthButton() {
   const { data: session, status } = useSession();
