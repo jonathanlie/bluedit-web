@@ -73,8 +73,10 @@ export default function SubblueditPage() {
         {sub.posts.length === 0 && <li className="text-gray-500">No posts yet.</li>}
         {sub.posts.map((post: { id: string; title: string; body: string }) => (
           <li key={post.id} className="border rounded p-3">
-            <h3 className="font-bold text-lg">{post.title}</h3>
-            <p>{post.body}</p>
+            <a href={`/b/${sub.name}/${post.id}`} className="block hover:bg-gray-50">
+              <h3 className="font-bold text-lg">{post.title}</h3>
+              <p className="text-gray-600">{post.body}</p>
+            </a>
           </li>
         ))}
       </ul>
