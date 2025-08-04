@@ -24,7 +24,7 @@ interface CommentListProps {
 export default function CommentList({ comments, currentUserId, onVoteChange }: CommentListProps) {
   if (!comments || comments.length === 0) {
     return (
-      <div className="text-gray-500 text-center py-8">
+      <div className="text-light-text-secondary text-center py-8">
         No comments yet. Be the first to comment!
       </div>
     );

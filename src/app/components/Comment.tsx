@@ -33,7 +33,7 @@ export default function Comment({ comment, currentUserId, onVoteChange }: Commen
   };
 
   return (
-    <div className="border-l-2 border-gray-200 pl-4 mb-4">
+    <div className="border-l-2 border-light-border pl-4 mb-4">
       <div className="flex items-start space-x-3">
         <VoteButton
           votableId={comment.id}
@@ -43,10 +43,10 @@ export default function Comment({ comment, currentUserId, onVoteChange }: Commen
           onVoteChange={handleVoteChange}
         />
         <div className="flex-1">
-          <div className="text-sm text-gray-500 mb-1">
+          <div className="text-sm text-light-text-secondary mb-1">
             {comment.user?.name || comment.user?.email || "Anonymous"}
           </div>
-          <div className="text-gray-800 mb-2">{comment.body}</div>
+          <div className="text-light-text-primary mb-2">{comment.body}</div>
 
           {/* Render replies */}
           {comment.replies && comment.replies.length > 0 && (
