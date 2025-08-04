@@ -31,7 +31,6 @@ const config: Config = {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
-        // Ensure we use the 4px grid system
         '18': '4.5rem', // 72px
         '88': '22rem',  // 352px
       },
