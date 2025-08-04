@@ -3,11 +3,11 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const voteButtonVariants = cva(
-  "inline-flex items-center justify-center rounded-md transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+  "inline-flex items-center justify-center rounded-full transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none",
   {
     variants: {
       variant: {
-        default: "text-light-text-secondary hover:text-light-text-primary hover:bg-light-fg",
+        default: "text-light-text-secondary hover:text-light-text-primary hover:bg-gray-100",
         upvoted: "text-brand hover:text-brand/80",
         downvoted: "text-brand-secondary hover:text-brand-secondary/80",
       },

@@ -3,9 +3,9 @@ import { useSession } from "next-auth/react";
 import { gql, useQuery } from "@apollo/client";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import VoteButton from "../../../components/VoteButton";
-import CommentList from "../../../components/CommentList";
-import CreateCommentForm from "../../../components/CreateCommentForm";
+import VoteButton from "@/app/components/VoteButton";
+import CommentList from "@/app/components/CommentList";
+import CreateCommentForm from "@/app/components/CreateCommentForm";
 
 const POST_DETAIL = gql`
   query PostDetail($postId: ID!) {
@@ -94,59 +94,84 @@ export default function PostDetailPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6">
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <Link href="/" className="text-blue-600 hover:underline">Home</Link>
-        <span className="mx-2">/</span>
-        <Link href={`/b/${sub.name}`} className="text-blue-600 hover:underline">b/{sub.name}</Link>
-        <span className="mx-2">/</span>
-        <span className="text-gray-600">Post</span>
-      </nav>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex gap-6">
+        {/* Main Content */}
+        <div className="flex-1 max-w-3xl">
+          {/* Breadcrumb */}
+          <nav className="mb-6">
+            <Link href="/" className="text-brand hover:underline">Home</Link>
+            <span className="mx-2 text-light-text-secondary">/</span>
+            <Link href={`/b/${sub.name}`} className="text-brand hover:underline">b/{sub.name}</Link>
+            <span className="mx-2 text-light-text-secondary">/</span>
+            <span className="text-light-text-secondary">Post</span>
+          </nav>
 
-      {/* Post */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-        <div className="flex items-start space-x-4">
-          <VoteButton
-            votableId={post.id}
-            votableType="Post"
-            currentVote={currentUserVote}
-            score={postVoteScore}
-          />
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-2">{post.title}</h1>
-            <div className="text-sm text-gray-500 mb-4">
-              Posted by {post.user?.name || post.user?.email || "Anonymous"} in b/{sub.name}
+          {/* Post */}
+          <div className="mb-6">
+            <div className="flex">
+              <div className="flex flex-col items-center mr-3 py-2 px-2">
+                <VoteButton
+                  votableId={post.id}
+                  votableType="Post"
+                  currentVote={currentUserVote}
+                  score={postVoteScore}
+                />
+              </div>
+              <div className="flex-1 py-2 pr-4">
+                <h1 className="text-2xl font-bold mb-2 text-light-text-primary">{post.title}</h1>
+                <div className="text-sm text-light-text-secondary mb-4">
+                  Posted by {post.user?.name || post.user?.email || "Anonymous"} in b/{sub.name}
+                </div>
+                <div className="text-light-text-primary mb-4 whitespace-pre-wrap leading-relaxed">{post.body}</div>
+              </div>
             </div>
-            <div className="text-gray-800 mb-4 whitespace-pre-wrap">{post.body}</div>
+          </div>
+
+          {/* Comments Section */}
+          <div className="overflow-hidden">
+            <div className="px-4 py-3 border-b border-light-border">
+              <h2 className="text-lg font-semibold text-light-text-primary">Comments</h2>
+            </div>
+
+            {/* Comment Form for logged-in users */}
+            {session && (
+              <div className="p-4 border-b border-light-border">
+                <CreateCommentForm
+                  postId={post.id}
+                  onCommentCreated={handleCommentCreated}
+                />
+              </div>
+            )}
+
+            {/* Comments List */}
+            <div className="p-4">
+              <CommentList
+                comments={post.comments || []}
+                currentUserId={session?.user?.id}
+                onVoteChange={handleVoteChange}
+              />
+
+              {!session && (
+                <div className="text-center py-8 text-light-text-secondary">
+                  <p>Please sign in to comment and vote.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Comments Section */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-xl font-semibold mb-6">Comments</h2>
-
-        {/* Comment Form for logged-in users */}
-        {session && (
-          <CreateCommentForm
-            postId={post.id}
-            onCommentCreated={handleCommentCreated}
-          />
-        )}
-
-        {/* Comments List */}
-        <CommentList
-          comments={post.comments || []}
-          currentUserId={session?.user?.id}
-          onVoteChange={handleVoteChange}
-        />
-
-        {!session && (
-          <div className="text-center py-8 text-gray-500">
-            <p>Please sign in to comment and vote.</p>
+        {/* Right Sidebar - Placeholder for future content */}
+        <div className="w-80 flex-shrink-0">
+          <div className="bg-black rounded-lg p-4 sticky top-4">
+            <h3 className="font-semibold text-white mb-3">About b/{sub.name}</h3>
+            <p className="text-sm text-gray-300 mb-4">{sub.description}</p>
+            <div className="text-xs text-gray-400">
+              <p>Created recently</p>
+              <p>Public community</p>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

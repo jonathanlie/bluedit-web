@@ -54,31 +54,9 @@ const PostCard: React.FC<PostCardProps> = ({
   };
 
   return (
-    <div className={cn("flex bg-light-fg hover:bg-gray-50 transition-colors duration-150 border-b border-light-border last:border-b-0", className)}>
-      {/* Vote Column */}
-      <div className="flex flex-col items-center mr-3 py-2 px-2">
-        <VoteButton
-          direction="up"
-          voteValue={post.userVote}
-          onVote={handleVote}
-          className="mb-1"
-        />
-        <span className={cn(
-          "text-xs font-medium min-w-[1.5rem] text-center",
-          post.score > 0 ? "text-brand" : post.score < 0 ? "text-brand-secondary" : "text-light-text-secondary"
-        )}>
-          {post.score}
-        </span>
-        <VoteButton
-          direction="down"
-          voteValue={post.userVote}
-          onVote={handleVote}
-          className="mt-1"
-        />
-      </div>
-
-      {/* Content Column */}
-      <div className="flex-1 min-w-0 py-2 pr-4">
+    <div className={cn("hover:bg-gray-800/50 transition-colors duration-150 border-b border-light-border last:border-b-0", className)}>
+      {/* Content */}
+      <div className="py-3 px-4">
         {/* Metadata */}
         <div className="flex items-center space-x-2 text-xs text-light-text-secondary mb-1">
           {showSubbluedit && (
@@ -116,13 +94,34 @@ const PostCard: React.FC<PostCardProps> = ({
           {post.body}
         </p>
 
-        {/* Footer */}
-        <div className="flex items-center">
+        {/* Footer with inline vote buttons */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
+            <VoteButton
+              direction="up"
+              voteValue={post.userVote}
+              onVote={handleVote}
+              size="sm"
+            />
+            <span className={cn(
+              "text-xs font-medium min-w-[1.5rem] text-center",
+              post.score > 0 ? "text-brand" : post.score < 0 ? "text-brand-secondary" : "text-light-text-secondary"
+            )}>
+              {post.score}
+            </span>
+            <VoteButton
+              direction="down"
+              voteValue={post.userVote}
+              onVote={handleVote}
+              size="sm"
+            />
+          </div>
+
           <Link
             href={`/b/${subblueditName || post.subbluedit?.name}/${post.id}`}
-            className="text-xs text-light-text-secondary hover:text-light-text-primary transition-colors duration-150 flex items-center space-x-1"
+            className="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs text-light-text-secondary hover:text-light-text-primary hover:bg-gray-700 transition-colors duration-150"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             <span>{post.commentCount || 0} comments</span>

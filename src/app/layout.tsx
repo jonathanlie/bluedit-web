@@ -16,20 +16,16 @@ export const metadata: Metadata = {
   description: "Share, discuss, and discover content in communities you love",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} font-sans antialiased bg-light-bg text-light-text-primary`}
-      >
+      <body className={`${inter.variable} font-sans antialiased bg-light-bg text-light-text-primary`}>
         <NextAuthProvider>
           <ApolloProvider>
-            <Navbar />
-            <main className="min-h-screen bg-light-bg">
+            <div className="sticky top-0 z-50">
+              <Navbar />
+            </div>
+            <main className="min-h-screen bg-light-bg pt-16">
               {children}
             </main>
           </ApolloProvider>
