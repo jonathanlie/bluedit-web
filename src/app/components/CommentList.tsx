@@ -18,10 +18,9 @@ interface CommentListProps {
     replies?: CommentListProps["comments"];
   }>;
   currentUserId?: string;
-  onVoteChange?: (commentId: string, newScore: number) => void;
 }
 
-export default function CommentList({ comments, currentUserId, onVoteChange }: CommentListProps) {
+export default function CommentList({ comments, currentUserId }: CommentListProps) {
   if (!comments || comments.length === 0) {
     return (
       <div className="text-light-text-secondary text-center py-8">
@@ -37,7 +36,6 @@ export default function CommentList({ comments, currentUserId, onVoteChange }: C
           key={comment.id}
           comment={comment}
           currentUserId={currentUserId}
-          onVoteChange={onVoteChange}
         />
       ))}
     </div>

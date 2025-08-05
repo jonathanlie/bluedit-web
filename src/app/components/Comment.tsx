@@ -18,19 +18,14 @@ interface CommentProps {
     replies?: CommentProps["comment"][];
   };
   currentUserId?: string;
-  onVoteChange?: (commentId: string, newScore: number) => void;
 }
 
-export default function Comment({ comment, currentUserId, onVoteChange }: CommentProps) {
+export default function Comment({ comment, currentUserId }: CommentProps) {
   // Calculate vote score
   const voteScore = comment.votes?.reduce((sum, vote) => sum + vote.value, 0) || 0;
 
   // Find current user's vote
   const currentVote = comment.votes?.find(vote => vote.user?.id === currentUserId)?.value || 0;
-
-  const handleVoteChange = (newScore: number) => {
-    onVoteChange?.(comment.id, newScore);
-  };
 
   return (
     <div className="border-l-2 border-light-border pl-4 mb-4">
@@ -40,7 +35,6 @@ export default function Comment({ comment, currentUserId, onVoteChange }: Commen
           votableType="Comment"
           currentVote={currentVote}
           score={voteScore}
-          onVoteChange={handleVoteChange}
         />
         <div className="flex-1">
           <div className="text-sm text-light-text-secondary mb-1">
@@ -56,7 +50,6 @@ export default function Comment({ comment, currentUserId, onVoteChange }: Commen
                   key={reply.id}
                   comment={reply}
                   currentUserId={currentUserId}
-                  onVoteChange={onVoteChange}
                 />
               ))}
             </div>

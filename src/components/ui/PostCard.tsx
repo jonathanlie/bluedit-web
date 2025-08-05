@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { VoteButton } from '@/components/ui/VoteButton';
+import VoteButton from '@/app/components/VoteButton';
 import { cn } from '@/lib/utils';
 
 export interface Post {
@@ -24,7 +24,6 @@ export interface PostCardProps {
   subblueditName?: string;
   showSubbluedit?: boolean;
   className?: string;
-  onVote?: (postId: string, direction: 'up' | 'down') => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -32,12 +31,7 @@ const PostCard: React.FC<PostCardProps> = ({
   subblueditName,
   showSubbluedit = true,
   className,
-  onVote,
 }) => {
-  const handleVote = (direction: 'up' | 'down') => {
-    onVote?.(post.id, direction);
-  };
-
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -96,26 +90,12 @@ const PostCard: React.FC<PostCardProps> = ({
 
         {/* Footer with inline vote buttons */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1">
-            <VoteButton
-              direction="up"
-              voteValue={post.userVote}
-              onVote={handleVote}
-              size="sm"
-            />
-            <span className={cn(
-              "text-xs font-medium min-w-[1.5rem] text-center",
-              post.score > 0 ? "text-brand" : post.score < 0 ? "text-brand-secondary" : "text-light-text-secondary"
-            )}>
-              {post.score}
-            </span>
-            <VoteButton
-              direction="down"
-              voteValue={post.userVote}
-              onVote={handleVote}
-              size="sm"
-            />
-          </div>
+          <VoteButton
+            votableId={post.id}
+            votableType="Post"
+            currentVote={post.userVote}
+            score={post.score}
+          />
 
           <Link
             href={`/b/${subblueditName || post.subbluedit?.name}/${post.id}`}
