@@ -76,20 +76,13 @@ export default function PostDetailPage() {
   const post = data.postById;
   const sub = post.subbluedit;
 
-  // Calculate post vote score
   const postVoteScore = post.votes?.reduce((sum: number, vote: { value: number }) => sum + vote.value, 0) || 0;
 
-  // Find current user's vote on post
   const currentUserVote = post.votes?.find((vote: { user: { id: string } }) =>
     vote.user?.id === session?.user?.id
   )?.value || 0;
 
   const handleCommentCreated = () => {
-    refetch();
-  };
-
-  const handleVoteChange = (commentId: string, newScore: number) => {
-    // This would typically update the cache, but for now we'll refetch
     refetch();
   };
 
@@ -149,7 +142,6 @@ export default function PostDetailPage() {
               <CommentList
                 comments={post.comments || []}
                 currentUserId={session?.user?.id}
-                onVoteChange={handleVoteChange}
               />
 
               {!session && (
@@ -161,7 +153,7 @@ export default function PostDetailPage() {
           </div>
         </div>
 
-        {/* Right Sidebar - Placeholder for future content */}
+        {/* Right Sidebar */}
         <div className="w-80 flex-shrink-0">
           <div className="bg-black rounded-lg p-4 sticky top-4">
             <h3 className="font-semibold text-white mb-3">About b/{sub.name}</h3>
