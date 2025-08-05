@@ -6,51 +6,13 @@ import Link from "next/link";
 import VoteButton from "@/app/components/VoteButton";
 import CommentList from "@/app/components/CommentList";
 import CreateCommentForm from "@/app/components/CreateCommentForm";
+import { POST_FIELDS } from "@/lib/graphql/fragments";
 
 const POST_DETAIL = gql`
+  ${POST_FIELDS}
   query PostDetail($postId: ID!) {
     postById(id: $postId) {
-      id
-      title
-      body
-      user {
-        name
-        email
-      }
-      votes {
-        value
-        user {
-          id
-        }
-      }
-      comments {
-        id
-        body
-        user {
-          name
-          email
-        }
-        votes {
-          value
-          user {
-            id
-          }
-        }
-        replies {
-          id
-          body
-          user {
-            name
-            email
-          }
-          votes {
-            value
-            user {
-              id
-            }
-          }
-        }
-      }
+      ...PostFields
       subbluedit {
         id
         name
@@ -64,7 +26,7 @@ export default function PostDetailPage() {
   const { name, post_id } = useParams<{ name: string; post_id: string }>();
   const { data: session } = useSession();
 
-  const { data, loading, error, refetch } = useQuery(POST_DETAIL, {
+  const { data, loading, error } = useQuery(POST_DETAIL, {
     variables: { postId: post_id },
     skip: !post_id
   });
@@ -81,10 +43,6 @@ export default function PostDetailPage() {
   const currentUserVote = post.votes?.find((vote: { user: { id: string } }) =>
     vote.user?.id === session?.user?.id
   )?.value || 0;
-
-  const handleCommentCreated = () => {
-    refetch();
-  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -132,7 +90,6 @@ export default function PostDetailPage() {
               <div className="p-4 border-b border-light-border">
                 <CreateCommentForm
                   postId={post.id}
-                  onCommentCreated={handleCommentCreated}
                 />
               </div>
             )}
