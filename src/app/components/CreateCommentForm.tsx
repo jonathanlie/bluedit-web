@@ -1,26 +1,22 @@
 "use client";
 import { gql, useMutation } from "@apollo/client";
 import { useState } from "react";
+import { COMMENT_FIELDS } from "@/lib/graphql/fragments";
 
 const CREATE_COMMENT = gql`
+  ${COMMENT_FIELDS}
   mutation CreateComment($postId: ID!, $body: String!) {
     createComment(postId: $postId, body: $body) {
-      id
-      body
-      user {
-        name
-        email
-      }
+      ...CommentFields
     }
   }
 `;
 
 interface CreateCommentFormProps {
   postId: string;
-  onCommentCreated?: () => void;
 }
 
-export default function CreateCommentForm({ postId, onCommentCreated }: CreateCommentFormProps) {
+export default function CreateCommentForm({ postId }: CreateCommentFormProps) {
   const [createComment, { loading }] = useMutation(CREATE_COMMENT);
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
@@ -39,11 +35,22 @@ export default function CreateCommentForm({ postId, onCommentCreated }: CreateCo
         variables: {
           postId,
           body: body.trim()
+        },
+        update: (cache, { data }) => {
+          // Update the post's comments in the cache
+          cache.modify({
+            id: cache.identify({ __typename: 'Post', id: postId }),
+            fields: {
+              comments(existingComments = []) {
+                // Add the new comment directly - Apollo will handle the structure
+                return [...existingComments, data.createComment];
+              }
+            }
+          });
         }
       });
 
       setBody("");
-      onCommentCreated?.();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
