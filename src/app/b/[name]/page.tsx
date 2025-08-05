@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { PostCard } from "@/components/ui/PostCard";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { SUBBLUEDIT_FIELDS, POST_FIELDS } from "@/lib/graphql/fragments";
 
 // Type for raw post data from GraphQL (before transformation)
 interface RawPost {
@@ -31,45 +32,19 @@ interface RawPost {
 }
 
 const SUBBLUEDIT_BY_NAME = gql`
+  ${SUBBLUEDIT_FIELDS}
   query SubblueditByName($name: String!) {
     subblueditByName(name: $name) {
-      id
-      name
-      description
-      posts {
-        id
-        title
-        body
-        user {
-          name
-        }
-        subbluedit {
-          name
-        }
-        comments {
-          id
-          body
-          user {
-            name
-          }
-        }
-        votes {
-          value
-          user {
-            id
-          }
-        }
-      }
+      ...SubblueditFields
     }
   }
 `;
 
 const CREATE_POST = gql`
+  ${POST_FIELDS}
   mutation CreatePost($subblueditName: String!, $title: String!, $body: String) {
     createPost(subblueditName: $subblueditName, title: $title, body: $body) {
-      id
-      title
-      body
+      ...PostFields
     }
   }
 `;
@@ -77,7 +52,7 @@ const CREATE_POST = gql`
 export default function SubblueditPage() {
   const { name } = useParams<{ name: string }>();
   const { data: session, status } = useSession();
-  const { data, loading, error, refetch } = useQuery(SUBBLUEDIT_BY_NAME, {
+  const { data, loading, error } = useQuery(SUBBLUEDIT_BY_NAME, {
     variables: { name },
     skip: !name
   });
@@ -126,10 +101,23 @@ export default function SubblueditPage() {
     e.preventDefault();
     setFormError("");
     try {
-      await createPost({ variables: { subblueditName: sub.name, title, body } });
+      await createPost({
+        variables: { subblueditName: sub.name, title, body },
+        update: (cache, { data }) => {
+          // Update the subbluedit's posts in the cache
+          cache.modify({
+            id: cache.identify({ __typename: 'Subbluedit', name: sub.name }),
+            fields: {
+              posts(existingPosts = []) {
+                // Add the new post to the beginning of the list
+                return [data.createPost, ...existingPosts];
+              }
+            }
+          });
+        }
+      });
       setTitle("");
       setBody("");
-      refetch();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setFormError(err.message);
@@ -137,11 +125,6 @@ export default function SubblueditPage() {
         setFormError("Failed to create post");
       }
     }
-  };
-
-  const handleVote = (postId: string, direction: 'up' | 'down') => {
-    // TODO: Implement voting functionality
-    console.log(`Voting ${direction} on post ${postId}`);
   };
 
   return (
@@ -250,7 +233,6 @@ export default function SubblueditPage() {
                       }}
                       subblueditName={sub.name}
                       showSubbluedit={false}
-                      onVote={handleVote}
                     />
                   );
                 })}
